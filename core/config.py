@@ -7,11 +7,16 @@ class Settings(BaseSettings):
         env_ignore_empty=True,
         extra="ignore",
     )
+
     MYSQL_USER: str
     MYSQL_PASSWORD: str
     MYSQL_HOST: str
     MYSQL_PORT: str
     MYSQL_DB: str
+
+    GOOGLE_CLIENT_ID: str
+
+    SECRET_KEY: str
 
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
