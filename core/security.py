@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from typing import Any
 
 import jwt
 from google.oauth2 import id_token
@@ -18,12 +19,15 @@ def verify_google_token(token: str) -> dict | None:
     except ValueError:
         return None
 
-def create_access_token(subject: str | int, expires_delta: timedelta = None) -> str:
+def create_access_token(subject: str | Any, expires_delta: timedelta = None) -> str:
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=30)
-    
+        expire = datetime.now(timezone.utc) + timedelta(minutes=1440)
     to_encode = {"exp": expire, "sub": str(subject)}
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm="HS256")
+    encoded_jwt = jwt.encode(
+        to_encode,
+        settings.SECRET_KEY,
+        algorithm="HS256"
+    )
     return encoded_jwt
