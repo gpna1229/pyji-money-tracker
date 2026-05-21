@@ -1,5 +1,5 @@
 from typing import Optional
-from datetime import date
+from datetime import datetime
 
 from pydantic import BaseModel, Field, ConfigDict
 
@@ -24,8 +24,8 @@ class TransactionBase(BaseModel):
     category: str = Field(..., max_length=50, description="帳目分類，如：飲食、交通")
     counterparty: Optional[str] = Field(None, max_length=100, description="交易對象，如：7-11、朋友")
     note: Optional[str] = Field(None, description="備註說明")
-    transaction_date: date = Field(..., description="交易日期")
-    accounting_date: date = Field(..., description="憑證日期")
+    transaction_date: datetime = Field(..., description="交易日期")
+    accounting_date: datetime = Field(..., description="憑證日期")
 
 
 class TransactionCreate(TransactionBase):
@@ -35,5 +35,5 @@ class TransactionCreate(TransactionBase):
 class TransactionResponse(TransactionBase):
     id: int
     user_id: int
-    created_at: date
+    created_at: datetime
     model_config = ConfigDict(from_attributes=True)

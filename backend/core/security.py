@@ -7,6 +7,8 @@ from google.auth.transport import requests
 
 from core.config import settings
 
+ALGORITHM = "HS256"
+
 def verify_google_token(token: str) -> dict | None:
     try:
         id_info = id_token.verify_oauth2_token(
@@ -28,6 +30,6 @@ def create_access_token(subject: str | Any, expires_delta: timedelta = None) -> 
     encoded_jwt = jwt.encode(
         to_encode,
         settings.SECRET_KEY,
-        algorithm="HS256"
+        algorithm=ALGORITHM
     )
     return encoded_jwt

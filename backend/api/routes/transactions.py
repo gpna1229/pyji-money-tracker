@@ -6,7 +6,7 @@ from schemas import TransactionResponse, TransactionCreate
 
 router = APIRouter(tags=["transactions"])
 
-@router.post("/", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/transactions/", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED)
 def create_transaction(
     session: SessionDep, payload: TransactionCreate, current_user: CurrentUser
 ):
