@@ -12,7 +12,7 @@ router = APIRouter(tags=["login"])
 def login_google(
     session: SessionDep, payload: GoogleCredentialRequest
 ):
-    google_user = security.verify_google_token(payload.token)
+    google_user = security.verify_google_token(payload.id_token)
     if not google_user:
         raise HTTPException(status_code=400, detail="Invalid Google token")
     

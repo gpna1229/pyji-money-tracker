@@ -13,7 +13,7 @@ class TokenPayload(BaseModel):
 
 
 class GoogleCredentialRequest(BaseModel):
-    token: str
+    id_token: str
 
 
 class TransactionBase(BaseModel):
