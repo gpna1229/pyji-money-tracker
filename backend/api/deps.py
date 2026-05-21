@@ -10,7 +10,8 @@ from sqlalchemy.orm import Session
 from core import security
 from core.config import settings
 from core.database import SessionLocal
-from models import User, TokenPayload
+from models import User
+from schemas import TokenPayload
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"/api/login/google"

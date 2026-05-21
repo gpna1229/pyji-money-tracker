@@ -3,8 +3,6 @@ from sqlalchemy.orm import relationship
 from datetime import datetime, timezone
 from typing import Optional
 
-from pydantic import BaseModel
-
 from core.database import Base
 
 class User(Base):
@@ -15,16 +13,3 @@ class User(Base):
     email = Column(String(255), unique=True, index=True, nullable=False)
     google_id = Column(String(255), unique=True, nullable=True)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
-
-
-class TokenPayload(BaseModel):
-    sub: Optional[str] = None
-
-
-class GoogleCredentialRequest(BaseModel):
-    token: str

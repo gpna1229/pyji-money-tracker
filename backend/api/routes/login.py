@@ -2,7 +2,8 @@ from fastapi import APIRouter, HTTPException
 
 from api.deps import SessionDep
 from core import security
-from models import GoogleCredentialRequest, User
+from models import User
+from schemas import GoogleCredentialRequest
 
 router = APIRouter(tags=["login"])
 
