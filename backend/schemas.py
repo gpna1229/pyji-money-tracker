@@ -1,7 +1,7 @@
 from typing import Optional
 from datetime import date
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 class Token(BaseModel):
     access_token: str
@@ -26,3 +26,14 @@ class TransactionBase(BaseModel):
     note: Optional[str] = Field(None, description="備註說明")
     transaction_date: date = Field(..., description="交易日期")
     accounting_date: date = Field(..., description="憑證日期")
+
+
+class TransactionCreate(TransactionBase):
+    pass
+
+
+class TransactionResponse(TransactionBase):
+    id: int
+    user_id: int
+    created_at: date
+    model_config = ConfigDict(from_attributes=True)
