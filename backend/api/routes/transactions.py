@@ -8,10 +8,10 @@ router = APIRouter(tags=["transactions"])
 
 @router.post("/transactions/", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED)
 def create_transaction(
-    session: SessionDep, payload: TransactionCreate, current_user: CurrentUser
+    session: SessionDep, item_in: TransactionCreate, current_user: CurrentUser
 ):
     db_transaction = Transaction(
-        **payload.model_dump(),
+        **item_in.model_dump(),
         user_id=current_user.id
     )
 

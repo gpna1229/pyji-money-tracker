@@ -44,6 +44,10 @@ class AccountBase(BaseModel):
     category: str
 
 
+class AccountCreate(AccountBase):
+    pass
+
+
 class AccountResponse(AccountBase):
     id: int
     user_id: int
