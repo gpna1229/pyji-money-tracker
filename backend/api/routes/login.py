@@ -4,6 +4,7 @@ from api.deps import SessionDep
 from core import security
 from models import User
 from schemas import GoogleCredentialRequest
+from services.user import create_new_user
 
 router = APIRouter(tags=["login"])
 
@@ -26,14 +27,7 @@ def login_google(
     db_user = session.query(User).filter(User.email == email).first()
     
     if not db_user:
-        db_user = User(
-            email=email,
-            name=name,
-            google_id=google_id
-        )
-        session.add(db_user)
-        session.commit()
-        session.refresh(db_user)
+        db_user = create_new_user(session, email, name, google_id)
 
     access_token = security.create_access_token(subject=str(db_user.id))
     return {

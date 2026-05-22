@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, status, HTTPException
 
 from api.deps import SessionDep, CurrentUser
-from models import Transaction, Account
+from models import Transaction
 from schemas import TransactionResponse, TransactionCreate
 
 router = APIRouter(tags=["transactions"])
