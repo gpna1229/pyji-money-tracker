@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, HTTPException
 
 from api.deps import SessionDep, CurrentUser
 from models import Transaction
@@ -41,21 +41,18 @@ def create_transaction(
 
 
 @router.delete("/transactions/delete")
-def delete_account(
+def delete_transaction(
     session: SessionDep, id: int, current_user: CurrentUser
 ):
-    account = session.query(Account).filter(
-        Account.id == id,
-        Account.user_id == current_user.id
+    transaction = session.query(Transaction).filter(
+        Transaction.id == id,
+        Transaction.user_id == current_user.id
     ).first()
 
-    if not account:
+    if not transaction:
         raise HTTPException(status_code=404, detail="查無帳戶！")
     
-    if account.src_transactions or account.dest_transactions:
-        raise HTTPException(status_code=400, detail="此帳戶已有交易紀錄，無法刪除。")
-    
-    session.delete(account)
+    session.delete(transaction)
     session.commit()
 
-    return {"message": "帳戶已成功刪除！"}
+    return {"message": "本筆交易已成功刪除！"}
