@@ -5,7 +5,7 @@ from sqlalchemy import func
 
 from api.deps import SessionDep, CurrentUser
 from models import Account, Transaction
-from schemas import AccountCreate, AccountResponse
+from schemas import AccountCreate, AccountResponse, AccountUpdate
 
 router = APIRouter(tags=["accounts"])
 
@@ -21,10 +21,10 @@ def get_accounts(
 
 @router.post("/accounts/create", response_model=AccountResponse)
 def create_account(
-    session: SessionDep, item_in: AccountCreate, current_user: CurrentUser
+    session: SessionDep, account_in: AccountCreate, current_user: CurrentUser
 ):
     account = Account(
-        **item_in.model_dump(),
+        **account_in.model_dump(),
         user_id=current_user.id
     )
     
@@ -81,3 +81,27 @@ def get_account_summary(
         "account_name": account.name,
         "balance": balance
     }
+
+
+@router.patch("/accounts/{account_id}/update")
+def update_account(
+    session: SessionDep, account_in: AccountUpdate, current_user: CurrentUser, account_id: int
+):
+    account = session.query(Account).filter(
+        Account.id == account_id, 
+        Account.user_id == current_user.id
+    ).first()
+
+    if not account:
+        raise HTTPException(status_code=404, detail="帳戶不存在")
+    
+    update_data = account_in.model_dump(exclude_unset=True, exclude_none=True)
+
+    for key, value in update_data.items():
+        setattr(account, key, value)
+
+    session.add(account)
+    session.commit()
+    session.refresh(account)
+
+    return account
