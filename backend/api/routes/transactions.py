@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, status, HTTPException
 
 from api.deps import SessionDep, CurrentUser
-from models import Transaction
+from models import Transaction, Account
 from schemas import TransactionResponse, TransactionCreate
 
 router = APIRouter(tags=["transactions"])
@@ -36,8 +36,14 @@ def create_transaction(
     session.add(transaction) 
     session.commit()           
     session.refresh(transaction)
+
+    account = session.query(Account).filter(Account.id == transaction.account_id).first()
+    account_name = account.name if account else "未知帳戶"
     
-    return transaction
+    return {
+        **transaction.__dict__,
+        "account_name": account_name
+    }
 
 
 @router.delete("/transactions/delete")
