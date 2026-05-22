@@ -24,6 +24,7 @@ class Account(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     name = Column(String(50), nullable=False)
+    initial_balance = Column(Integer, default=0)
     category = Column(String(30), nullable=False)
 
     user = relationship("User", back_populates="accounts")

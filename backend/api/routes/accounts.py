@@ -1,9 +1,10 @@
 from typing import List
 
 from fastapi import APIRouter, HTTPException
+from sqlalchemy import func
 
 from api.deps import SessionDep, CurrentUser
-from models import Account
+from models import Account, Transaction
 from schemas import AccountCreate, AccountResponse
 
 router = APIRouter(tags=["accounts"])
@@ -53,3 +54,30 @@ def delete_account(
     session.commit()
 
     return {"message": "帳戶已成功刪除！"}
+
+
+@router.get("/accounts/{account_id}/balance")
+def get_account_summary(
+    session: SessionDep, current_user: CurrentUser, account_id: int
+):
+    account = session.query(Account).filter(
+        Account.id == account_id, 
+        Account.user_id == current_user.id
+    ).first()
+
+    if not account:
+        raise HTTPException(status_code=404, detail="帳戶不存在")
+    
+    total_income = session.query(func.sum(Transaction.amount))\
+        .filter(Transaction.account_id == account_id, Transaction.type == "INCOME").scalar() or 0
+        
+    total_expense = session.query(func.sum(Transaction.amount))\
+        .filter(Transaction.account_id == account_id, Transaction.type == "EXPENSE").scalar() or 0
+    
+    balance = account.initial_balance + total_income - total_expense
+    
+    return {
+        "account_id": account_id,
+        "account_name": account.name,
+        "balance": balance
+    }

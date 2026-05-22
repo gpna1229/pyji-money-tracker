@@ -41,6 +41,7 @@ class TransactionResponse(TransactionBase):
 
 class AccountBase(BaseModel):
     name: str
+    initial_balance: int
     category: str
 
 
