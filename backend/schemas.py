@@ -39,6 +39,17 @@ class TransactionResponse(TransactionBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class TransactionUpate(TransactionBase):
+    account_name: str | None = None
+    type: str | None = None
+    amount: int | None = None
+    category: str | None = None
+    counterparty: str | None = None
+    note: str | None = None
+    transaction_date: date | None = None
+    accounting_date: date | None = None
+
+
 class AccountBase(BaseModel):
     name: str
     initial_balance: int
