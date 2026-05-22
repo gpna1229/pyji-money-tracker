@@ -51,3 +51,7 @@ class Transaction(Base):
     user = relationship("User", back_populates="transactions")
     account = relationship("Account", foreign_keys=[account_id], back_populates="src_transactions")
     to_account = relationship("Account", foreign_keys=[to_account_id], back_populates="dest_transactions")
+
+    @property
+    def account_name(self):
+        return self.account.name if self.account else "未知帳戶"

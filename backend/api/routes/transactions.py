@@ -14,14 +14,7 @@ def get_transactions(
 ):
     db_transactions = session.query(Transaction).filter(Transaction.user_id == current_user.id).all()
     
-    transactions = []
-    for t in db_transactions:
-        account_name = t.account.name if t.account else "未知帳戶"
-        transactions.append({
-            **t.__dict__,
-            "account_name": account_name
-        })
-    return transactions
+    return db_transactions
 
 
 @router.post("/transactions/create", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED)
@@ -37,13 +30,7 @@ def create_transaction(
     session.commit()           
     session.refresh(transaction)
 
-    account = session.query(Account).filter(Account.id == transaction.account_id).first()
-    account_name = account.name if account else "未知帳戶"
-    
-    return {
-        **transaction.__dict__,
-        "account_name": account_name
-    }
+    return transaction
 
 
 @router.delete("/transactions/delete")
