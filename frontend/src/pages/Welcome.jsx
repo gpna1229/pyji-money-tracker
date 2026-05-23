@@ -1,23 +1,42 @@
 import React from 'react';
+import axios from 'axios';
+import { GoogleLogin } from '@react-oauth/google';
+import { useNavigate } from 'react-router-dom';
+import { IconBrandGithub } from '@tabler/icons-react';
 import logo from '../assets/logo.png';
-import { IconArrowRight, IconBrandGithub } from '@tabler/icons-react';
 
 const Welcome = () => {
+  const navigate = useNavigate();
+
+  const handleSuccess = async (credentialResponse) => {
+    try {
+      const { data } = await axios.post('http://127.0.0.1:8001/api/login/google', {
+        id_token: credentialResponse.credential,
+      });
+
+      localStorage.setItem('pyji_token', data.access_token);
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('登入失敗:', err.response?.data || err.message);
+    }
+  };
+
   return (
     <div className="welcome-container">
-      <img src={logo} alt="Pyji Logo" style={{width: '500px', height: 'auto'}}/>
+      <img src={logo} alt="Pyji Logo" style={{ width: '500px', height: 'auto' }} />
       <h2>一個專為現代人打造的記帳網站</h2>
       <p className="highlight-text">整合銀行、信用卡與電子支付，輕鬆記錄繁忙生活中的每一筆支出。</p>
 
-      <div style={{ display: 'flex', gap: '16px', marginTop: '32px' }}>
-        <button className="btn btn-google">
-          使用 Google 登入
-          <IconArrowRight size={18} />
-        </button>
-        
-        <a href="https://github.com/gpna1229/pyji-money-tracker" target="_blank" rel="noopener noreferrer" className="btn btn-github">
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px', marginTop: '40px' }}>
+        <GoogleLogin onSuccess={handleSuccess} onError={() => console.log('登入失敗')} theme="filled_blue"/>
+        <a 
+          href="https://github.com/gpna1229/pyji-money-tracker" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="btn btn-github"
+        >
           <IconBrandGithub size={18} />
-            GitHub
+            關於本專案
         </a>
       </div>
     </div>
