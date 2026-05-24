@@ -1,5 +1,8 @@
 import React from 'react';
-import { BrowserRouter, useLocation, Outlet } from 'react-router-dom'
+import { Routes, Route, Navigate, BrowserRouter, useLocation, Outlet } from 'react-router-dom'
+import { GoogleOAuthProvider } from '@react-oauth/google'
+
+import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
 import Navbar from './components/Navbar';
 import Welcome from './pages/Welcome';
@@ -10,7 +13,6 @@ import './styles/app.css';
 
 const Layout = () => {
   const location = useLocation();
-
   if (location.pathname === '/') return <Outlet />;
   
   return (
@@ -23,10 +25,24 @@ const Layout = () => {
   );
 };
 
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID
+
 function App() {
   return (
     <BrowserRouter>
-      <Layout />
+      <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<Welcome />} />
+            <Route element={<PrivateRoute><Layout /></PrivateRoute>}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/ledger" element={<Ledger />} />
+              <Route path="/assets" element={<Assets />} />
+            </Route>
+          <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </AuthProvider>
+      </GoogleOAuthProvider>
     </BrowserRouter>
   );
 }
