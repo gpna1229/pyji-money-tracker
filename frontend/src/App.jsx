@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter, useLocation, Outlet } from 'react-router-dom'
 import PrivateRoute from './components/PrivateRoute';
 import Navbar from './components/Navbar';
 import Welcome from './pages/Welcome';
@@ -10,18 +10,14 @@ import './styles/app.css';
 
 const Layout = () => {
   const location = useLocation();
+
+  if (location.pathname === '/') return <Outlet />;
   
   return (
-    <div className="app-wrapper">
-      {location.pathname !== '/' && <Navbar />}
-      
+    <div className="app-layout">
+      <Navbar />
       <main className="main-content">
-        <Routes>
-          <Route path="/" element={<Welcome />} />
-          <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-          <Route path="/ledger" element={<PrivateRoute><Ledger /></PrivateRoute>} />
-          <Route path="/assets" element={<PrivateRoute><Assets /></PrivateRoute>} />
-        </Routes>
+        <Outlet /> 
       </main>
     </div>
   );

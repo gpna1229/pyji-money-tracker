@@ -57,7 +57,68 @@ p { font-size: 20px; color: var(--text-secondary); }
 
 .btn:hover { opacity: 0.9; }
 
-.btn-github { background-color: var(--white); color: var(--dark-text); border: 1px solid var(--border-color); }
+.btn-github { 
+  background-color: var(--white); 
+  color: var(--dark-text); 
+  border: 1px solid var(--border-color); 
+}
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg);
+}
+
+.sidebar {
+  width: 350px;
+  background: var(--dark);
+  color: var(--white);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-area {
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--white);
+  margin-bottom: 48px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  padding: 12px 16px;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+}
+
+.nav-item:hover {
+  color: var(--white); 
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.nav-item.active {
+  background: var(--primary);
+  color: white;
+}
+
+.main-content {
+  flex: 1;
+  padding: 30px;
+}
 
 .card {
   background: var(--white);
