@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap');
 
+input, select, textarea, button, option {
+  font-family: inherit;
+}
+
 :root {
   --primary: #669bbc;
   --bg: #fdf0d5;
@@ -79,15 +83,19 @@ p { font-size: 20px; color: var(--text-secondary); }
 }
 
 .brand-area {
-  font-size: 28px;
+  display: flex;
+  font-size: 40px;
   font-weight: bold;
   color: var(--white);
   margin-bottom: 48px;
   padding-bottom: 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  align-items: flex-end;
+  justify-content: center;
 }
 
 .nav-list {
+  font-size: 20px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -113,6 +121,25 @@ p { font-size: 20px; color: var(--text-secondary); }
 .nav-item.active {
   background: var(--primary);
   color: white;
+}
+
+.logout-area {
+  margin-top: auto; 
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logout-button {
+  font-family: inherit;
+  font-size: 20px;
+  cursor: pointer;
+  width: 100%;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.logout-button:hover {
+  color: #ffa69e;
+  background: rgba(255, 107, 107, 0.1);
 }
 
 .main-content {
