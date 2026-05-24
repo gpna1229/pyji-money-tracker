@@ -8,16 +8,20 @@ import logo from '../assets/logo.png';
 const Welcome = () => {
   const navigate = useNavigate();
 
-  const handleSuccess = async (credentialResponse) => {
+  const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const { data } = await axios.post('http://127.0.0.1:8001/api/login/google', {
+      const response = await axios.post('http://127.0.0.1:8001/api/login/google', {
         id_token: credentialResponse.credential,
       });
 
-      localStorage.setItem('pyji_token', data.access_token);
-      navigate('/dashboard');
+      const { access_token, user } = response.data;
+
+      localStorage.setItem('pyji_token', access_token);
+      localStorage.setItem('user', JSON.stringify(user));
+
+      window.location.href = '/dashboard';
     } catch (err) {
-      console.error('登入失敗:', err.response?.data || err.message);
+      console.error('登入失敗', err.response?.data || err.message);
     }
   };
 
@@ -28,7 +32,7 @@ const Welcome = () => {
       <p className="highlight-text">整合銀行、信用卡與電子支付，輕鬆記錄繁忙生活中的每一筆支出。</p>
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px', marginTop: '40px' }}>
-        <GoogleLogin onSuccess={handleSuccess} onError={() => console.log('登入失敗')} theme="filled_blue"/>
+        <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => console.log('登入失敗')}/>
         <a 
           href="https://github.com/gpna1229/pyji-money-tracker" 
           target="_blank" 
