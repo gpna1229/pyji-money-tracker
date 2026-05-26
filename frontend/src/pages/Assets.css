@@ -82,12 +82,12 @@ h1, h2, h3 {
 }
 
 .summary-card .label {
-  font-size: 0.9rem;
+  font-size: 20px;
   color: #666;
 }
 
 .summary-card .total-amount {
-  font-size: 2rem;
+  font-size: 30px;
   margin: 8px 0 0 0;
   color: #222;
 }
@@ -97,7 +97,7 @@ h1, h2, h3 {
 }
 
 .category-title {
-  font-size: 1.1rem;
+  font-size: 20px;
   margin-bottom: 12px;
   color: #444;
   border-left: 4px solid var(--primary-color);
@@ -105,6 +105,7 @@ h1, h2, h3 {
 }
 
 .account-item {
+  font-size: 24px;
   display: flex;
   justify-content: space-between;
   padding: 16px;
