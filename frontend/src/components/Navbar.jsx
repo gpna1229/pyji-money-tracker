@@ -2,7 +2,6 @@ import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { IconHome, IconNotebook, IconCoins, IconLogout } from '@tabler/icons-react';
 
-import logo from '../assets/logo2.png';
 import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
@@ -22,8 +21,7 @@ const Navbar = () => {
   return (
     <aside className="sidebar">
       <div className="brand-area">
-      <img src={logo} alt="Pyji Logo" style={{ width: '200px', height: 'auto' }} />
-        <span>Pyji</span>
+        Pyji
       </div>
       <div className="nav-list">
         <NavLink to="/dashboard" className={({isActive}) => isActive ? "nav-item active" : "nav-item"}>
