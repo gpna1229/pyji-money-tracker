@@ -57,7 +57,7 @@ const Assets = () => {
             <option>現金</option>
             <option>銀行帳戶</option>
             <option>信用卡</option>
-            <option>金融卡</option>
+            <option>點數帳戶</option>
           </select>
         </div>
         <div className="form-group">
