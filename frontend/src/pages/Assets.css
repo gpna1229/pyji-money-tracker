@@ -72,3 +72,52 @@ h1, h2, h3 {
   border-radius: 4px;
   font-size: 12px;
 }
+
+.summary-card {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 32px;
+}
+
+.summary-card .label {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.summary-card .total-amount {
+  font-size: 2rem;
+  margin: 8px 0 0 0;
+  color: #222;
+}
+
+.category-section {
+  margin-bottom: 24px;
+}
+
+.category-title {
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  color: #444;
+  border-left: 4px solid var(--primary-color);
+  padding-left: 12px;
+}
+
+.account-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+  background: #f9f9f9;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  transition: transform 0.2s;
+}
+
+.account-item:hover {
+  background: #f0f0f0;
+}
+
+.account-item .amount {
+  font-weight: 600;
+}
