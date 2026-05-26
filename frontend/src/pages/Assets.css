@@ -121,3 +121,14 @@ h1, h2, h3 {
 .account-item .amount {
   font-weight: 600;
 }
+
+.error-text {
+  color: var(--danger);
+  font-size: 20px;
+  margin-top: 5px;
+  display: block;
+}
+
+input.input-error {
+  border: 1px solid var(--danger);
+}

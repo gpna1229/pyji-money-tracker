@@ -23,6 +23,17 @@ def get_accounts(
 def create_account(
     session: SessionDep, account_in: AccountCreate, current_user: CurrentUser
 ):
+    existing = session.query(Account).filter(
+        Account.user_id == current_user.id, 
+        Account.name == account_in.name
+    ).first()
+
+    if existing:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"新增失敗：已存在此帳戶囉！"
+        )
+
     account = Account(
         **account_in.model_dump(),
         user_id=current_user.id

@@ -19,7 +19,7 @@ export const apiFetch = async (endpoint, options = {}) => {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.detail || '操作失敗');
+    throw new Error(errorData.detail || '${response.status}');
   }
   return response.json();
 };

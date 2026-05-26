@@ -6,6 +6,7 @@ import './Assets.css';
 
 const Assets = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [errors, setErrors] = useState({});
   const [assets, setAssets] = useState([]);
   const [formData, setFormData] = useState({ name: '', category: '現金', initial_balance: 0 });
 
@@ -38,6 +39,7 @@ const Assets = () => {
 
   const handleSave = async () => {
     try {
+      setErrors({});
       await apiFetch('/accounts/create', {
         method: 'POST',
         body: JSON.stringify({
@@ -49,8 +51,14 @@ const Assets = () => {
       setIsModalOpen(false);
       loadData();
     } catch (err) {
-      alert(err.message);
+      setErrors({ name: err.message });
     }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setFormData({ name: '', category: '現金', initial_balance: 0 });
+    setErrors({});
   };
 
   const totalBalance = assets.reduce((sum, item) => sum + item.balance, 0);
@@ -62,10 +70,11 @@ const Assets = () => {
         <button className="add-btn" onClick={() => setIsModalOpen(true)}>+ 新增帳戶</button>
       </header>
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="新增帳戶">
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal} title="新增帳戶">
         <div className="form-group">
           <label>帳戶名稱</label>
-          <input name="name" type="text" onChange={handleChange} />
+          <input name="name" type="text" onChange={handleChange} className={errors.name ? 'input-error' : ''}/>
+          {errors.name && <span className="error-text">{errors.name}</span>}
         </div>
         <div className="form-group">
           <label>帳戶類型</label>
