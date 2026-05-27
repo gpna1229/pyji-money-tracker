@@ -1,5 +1,7 @@
 import React from 'react';
 import axios from 'axios';
+
+import './Welcome.css';
 import { GoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import { IconBrandGithub } from '@tabler/icons-react';

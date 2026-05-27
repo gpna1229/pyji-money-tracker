@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { IconHome, IconNotebook, IconCoins, IconLogout } from '@tabler/icons-react';
 
+import './Navbar.css';
 import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
