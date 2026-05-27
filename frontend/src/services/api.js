@@ -11,6 +11,8 @@ export const apiFetch = async (endpoint, options = {}) => {
     headers: { ...getHeaders(), ...options.headers }
   });
 
+  const data = await response.json();
+
   if (response.status === 401) {
     localStorage.removeItem('pyji_token');
     window.location.href = '/'; 
@@ -18,8 +20,7 @@ export const apiFetch = async (endpoint, options = {}) => {
   }
 
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.detail || '${response.status}');
+    throw data;
   }
-  return response.json();
+  return data;
 };

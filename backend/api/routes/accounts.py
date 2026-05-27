@@ -1,6 +1,7 @@
 from typing import List
 
 from fastapi import APIRouter, HTTPException
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy import func
 
 from api.deps import SessionDep, CurrentUser
@@ -8,6 +9,26 @@ from models import Account, Transaction
 from schemas import AccountCreate, AccountResponse, AccountUpdate
 
 router = APIRouter(tags=["accounts"])
+
+def raise_field_error(field: str, message: str):
+    raise HTTPException(
+        status_code=422,
+        detail=jsonable_encoder({"field": field, "message": message})
+    )
+
+def validate_account_data(session, user_id, name, balance, exclude_id=None):
+    if not name or name.strip() == "":
+        raise HTTPException(status_code=422, detail={"field": "name", "message": "請填入帳戶名稱！"})
+    
+    if balance < 0:
+        raise HTTPException(status_code=422, detail={"field": "initial_balance", "message": "請填入正確的金額！"})
+
+    query = session.query(Account).filter(Account.user_id == user_id, Account.name == name)
+    if exclude_id:
+        query = query.filter(Account.id != exclude_id)
+        
+    if query.first():
+        raise HTTPException(status_code=400, detail={"field": "name", "message": "已存在此帳戶囉！"})
 
 
 @router.get("/accounts/", response_model=List[AccountResponse])
@@ -23,21 +44,20 @@ def get_accounts(
 def create_account(
     session: SessionDep, account_in: AccountCreate, current_user: CurrentUser
 ):
-    existing = session.query(Account).filter(
-        Account.user_id == current_user.id, 
-        Account.name == account_in.name
-    ).first()
-
-    if existing:
-        raise HTTPException(
-            status_code=400, 
-            detail=f"新增失敗：已存在此帳戶囉！"
-        )
+    validate_account_data(
+        session, 
+        current_user.id, 
+        account_in.name, 
+        account_in.initial_balance
+    )
 
     account = Account(
         **account_in.model_dump(),
         user_id=current_user.id
     )
+
+    if account_in.initial_balance < 0:
+        raise_field_error("initial_balance", "初始資產不可為負數！")
     
     session.add(account) 
     session.commit()           
@@ -104,7 +124,15 @@ def update_account(
     ).first()
 
     if not account:
-        raise HTTPException(status_code=404, detail="帳戶不存在")
+        raise HTTPException(status_code=404, detail="帳戶不存在！")
+    
+    validate_account_data(
+        session, 
+        current_user.id, 
+        account_in.name, 
+        account_in.initial_balance,
+        exclude_id=account.id
+    )
     
     update_data = account_in.model_dump(exclude_unset=True, exclude_none=True)
 

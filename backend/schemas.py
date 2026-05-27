@@ -15,6 +15,9 @@ class TokenPayload(BaseModel):
 class GoogleCredentialRequest(BaseModel):
     id_token: str
 
+class ErrorResponse(BaseModel):
+    field: str
+    message: str
 
 class TransactionBase(BaseModel):
     account_id: int = Field(..., description="交易主帳戶")

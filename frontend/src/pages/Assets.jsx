@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import { IconPencil, IconTrash } from '@tabler/icons-react';
 import Modal from '../components/Modal';
 import { apiFetch } from '../services/api';
 import './Assets.css';
+
+const ACCOUNT_CATEGORIES = ['現金', '銀行帳戶', '信用卡', '電子支付', '點數帳戶'];
+const INITIAL_FORM_STATE = { name: '', category: '現金', initial_balance: 0 };
 
 const Assets = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -11,59 +14,67 @@ const Assets = () => {
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [errors, setErrors] = useState({});
   const [assets, setAssets] = useState([]);
-  const [formData, setFormData] = useState({ name: '', category: '現金', initial_balance: 0 });
-
-  const categories = ['現金', '銀行帳戶', '信用卡', '電子支付', '點數帳戶'];
+  const [accountForm, setAccountForm] = useState(INITIAL_FORM_STATE);
 
   const loadData = async () => {
     try {
-      const accData = await apiFetch('/accounts/');
-      const balancePromises = accData.map(async (acc) => {
-        try {
-          const balData = await apiFetch(`/accounts/${acc.id}/balance`);
-          return { ...acc, balance: balData.balance || 0 };
-        } catch {
-          return { ...acc, balance: acc.initial_balance || 0 };
-        }
-      });
-      setAssets(await Promise.all(balancePromises));
+      const accounts = await apiFetch('/accounts/');
+      const accountsWithBalance = await Promise.all(
+        accounts.map(async (acc) => {
+          try {
+            const balData = await apiFetch(`/accounts/${acc.id}/balance`);
+            return { ...acc, balance: balData.balance || 0 };
+          } catch {
+            return { ...acc, balance: acc.initial_balance || 0 };
+          }
+        })
+      );
+      setAssets(accountsWithBalance);
     } catch (err) {
-      console.error('載入資產失敗:', err);
+      console.error('資產載入失敗:', err);
     }
   };
 
   useEffect(() => { loadData(); }, []);
 
+  const totalBalance = useMemo(() => 
+    assets.reduce((sum, item) => sum + item.balance, 0), 
+  [assets]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const limits = { name: 10, initial_balance: 15 };
+
+    if (limits[name] && value.length > limits[name]) return;
+
+    setAccountForm(prev => ({ ...prev, [name]: value }));
+
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
   };
 
   const handleSave = async () => {
+    setErrors({});
+    const isEdit = !!selectedAccount;
+    const url = isEdit ? `/accounts/${selectedAccount.id}/update` : '/accounts/create';
+    const method = isEdit ? 'PATCH' : 'POST';
+    
     try {
-      setErrors({});
-      const url = isEditMode ? `/accounts/${selectedAccount.id}/update` : '/accounts/create';
-      const method = isEditMode ? 'PATCH' : 'POST';
-      
       await apiFetch(url, {
-        method: method,
+        method,
         body: JSON.stringify({
-          ...formData,
-          initial_balance: Number(formData.initial_balance)
+          ...accountForm,
+          initial_balance: Number(accountForm.initial_balance)
         })
       });
-
-      if (isEditMode) {
-        setSelectedAccount({ ...formData, id: selectedAccount.id, balance: selectedAccount.balance });
-        setIsEditMode(false);
-        loadData();
-      } else {
-        setIsModalOpen(false);
-        loadData();
-        handleCloseModal();
-      }
+      
+      await loadData();
+      handleCloseModal();
     } catch (err) {
-      setErrors({ name: err.message });
+      setErrors(
+        err.detail?.field 
+        ? { [err.detail.field]: err.detail.message } 
+        : { name: err.detail?.message || err.message || "發生未知錯誤！" }
+      );
     }
   };
 
@@ -71,18 +82,24 @@ const Assets = () => {
     if (!window.confirm(`確定刪除「${selectedAccount.name}」嗎？`)) return;
     try {
       await apiFetch(`/accounts/delete?id=${selectedAccount.id}`, { method: 'DELETE' });
-      alert('帳戶刪除成功！');
+      alert('刪除成功！');
       setIsModalOpen(false);
       loadData();
     } catch (err) {
-      alert(err.message || '刪除失敗，請稍後再試！');
+      alert(typeof err.detail === 'string' ? err.detail : '刪除失敗，請稍後再試！');
     }
   };
 
-  const openAccountDetail = (account) => {
-    setSelectedAccount(account);
-    setFormData(account);
-    setIsEditMode(false);
+  const handleOpenModal = (account = null) => {
+    if (account) {
+      setSelectedAccount(account);
+      setAccountForm(account);
+      setIsEditMode(false);
+    } else {
+      setSelectedAccount(null);
+      setAccountForm(INITIAL_FORM_STATE);
+      setIsEditMode(false);
+    }
     setIsModalOpen(true);
   };
 
@@ -90,17 +107,15 @@ const Assets = () => {
     setIsModalOpen(false);
     setIsEditMode(false);
     setSelectedAccount(null);
-    setFormData({ name: '', category: '現金', initial_balance: 0 });
+    setAccountForm(INITIAL_FORM_STATE);
     setErrors({});
   };
-
-  const totalBalance = assets.reduce((sum, item) => sum + item.balance, 0);
 
   return (
     <>
       <header className="assets-header">
         <h1>資產總覽</h1>
-        <button className="add-btn" onClick={() => setIsModalOpen(true)}>+ 新增帳戶</button>
+        <button className="add-btn" onClick={() => handleOpenModal()}>+ 新增帳戶</button>
       </header>
 
       <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={isEditMode ? "編輯帳戶" : (selectedAccount ? "帳戶詳情" : "新增帳戶")}>
@@ -108,18 +123,19 @@ const Assets = () => {
           <>
             <div className="form-group">
               <label>帳戶名稱</label>
-              <input name="name" type="text" value={formData.name} onChange={handleChange} className={errors.name ? 'input-error' : ''}/>
+              <input name="name" type="text" value={accountForm.name} onChange={handleChange} className={errors.name ? 'input-error' : ''}/>
               {errors.name && <span className="error-text">{errors.name}</span>}
             </div>
             <div className="form-group">
               <label>帳戶類型</label>
-              <select name="category" value={formData.category} onChange={handleChange}>
-                {categories.map(c => <option key={c} value={c}>{c}</option>)}
+              <select name="category" value={accountForm.category} onChange={handleChange}>
+                {ACCOUNT_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <div className="form-group">
               <label>初始餘額</label>
-              <input name="initial_balance" type="number" value={formData.initial_balance} onChange={handleChange} />
+              <input name="initial_balance" type="number" value={accountForm.initial_balance} onChange={handleChange} className={errors.initial_balance ? 'input-error' : ''}/>
+              {errors.initial_balance && <span className="error-text">{errors.initial_balance}</span>}
             </div>
             <button className="save-btn" onClick={handleSave}>儲存帳戶</button>
           </>
@@ -129,12 +145,8 @@ const Assets = () => {
             <p>帳戶類型：{selectedAccount.category}</p>
             <p>初始資產：NT$ {selectedAccount.initial_balance.toLocaleString()}</p>
             <div className="modal-actions">
-              <button onClick={() => setIsEditMode(true)} className="icon-btn edit-btn" title="編輯">
-                <IconPencil size={20} />
-              </button>
-              <button onClick={handleDelete} className="icon-btn delete-btn" title="刪除">
-                <IconTrash size={20} />
-              </button>
+              <button onClick={() => setIsEditMode(true)} className="icon-btn edit-btn"><IconPencil size={20} /></button>
+              <button onClick={handleDelete} className="icon-btn delete-btn"><IconTrash size={20} /></button>
             </div>
           </div>
         )}
@@ -146,14 +158,14 @@ const Assets = () => {
       </section>
 
       <div className="assets-grid">
-        {categories.map((category) => {
+        {ACCOUNT_CATEGORIES.map((category) => {
           const filtered = assets.filter(item => item.category === category);
           if (filtered.length === 0) return null;
           return (
             <div key={category} className="category-section">
               <h3 className="category-title">{category}</h3>
               {filtered.map(item => (
-                <div key={item.id} className="account-item" onClick={() => openAccountDetail(item)} style={{cursor: 'pointer'}}>
+                <div key={item.id} className="account-item" onClick={() => handleOpenModal(item)} style={{cursor: 'pointer'}}>
                   <span>{item.name}</span>
                   <span className="amount">NT$ {item.balance.toLocaleString()}</span>
                 </div>
