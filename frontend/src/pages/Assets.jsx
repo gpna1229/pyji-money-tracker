@@ -97,7 +97,7 @@ const Assets = () => {
   const totalBalance = assets.reduce((sum, item) => sum + item.balance, 0);
 
   return (
-    <div className="assets-container">
+    <>
       <header className="assets-header">
         <h1>資產總覽</h1>
         <button className="add-btn" onClick={() => setIsModalOpen(true)}>+ 新增帳戶</button>
@@ -162,7 +162,7 @@ const Assets = () => {
           );
         })}
       </div>
-    </div>
+    </>
   );
 };
 

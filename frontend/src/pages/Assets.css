@@ -1,9 +1,3 @@
-.assets-container {
-  min-height: 100vh;
-  padding: 32px;
-  background-color: var(--bg);
-}
-
 .assets-header {
   display: flex;
   align-items: center;
