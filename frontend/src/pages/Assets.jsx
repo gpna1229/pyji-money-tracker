@@ -141,9 +141,9 @@ const Assets = () => {
           </>
         ) : (
           <div className="account-detail">
-            <p>帳戶名稱：{selectedAccount.name}</p>
-            <p>帳戶類型：{selectedAccount.category}</p>
-            <p>初始資產：NT$ {selectedAccount.initial_balance.toLocaleString()}</p>
+            <p><strong>帳戶名稱：</strong>{selectedAccount.name}</p>
+            <p><strong>帳戶類型：</strong>{selectedAccount.category}</p>
+            <p><strong>初始資產：</strong>NT$ {selectedAccount.initial_balance.toLocaleString()}</p>
             <div className="modal-actions">
               <button onClick={() => setIsEditMode(true)} className="icon-btn edit-btn"><IconPencil size={20} /></button>
               <button onClick={handleDelete} className="icon-btn delete-btn"><IconTrash size={20} /></button>

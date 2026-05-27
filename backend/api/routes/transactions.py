@@ -1,6 +1,7 @@
 from typing import List
 
 from fastapi import APIRouter, status, HTTPException
+from sqlalchemy.orm import joinedload
 
 from api.deps import SessionDep, CurrentUser
 from models import Transaction
@@ -12,7 +13,9 @@ router = APIRouter(tags=["transactions"])
 def get_transactions(
     session: SessionDep, current_user: CurrentUser
 ):
-    db_transactions = session.query(Transaction).filter(Transaction.user_id == current_user.id).all()
+    db_transactions = session.query(Transaction).options(
+        joinedload(Transaction.account)
+    ).filter(Transaction.user_id == current_user.id).all()
     
     return db_transactions
 
