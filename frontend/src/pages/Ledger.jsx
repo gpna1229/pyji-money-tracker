@@ -86,9 +86,17 @@ const Ledger = () => {
   };
 
   const handleSave = async () => {
+    const url = selectedTx ? `/transactions/${selectedTx.id}/update` : '/transactions/create';
+    const payload = {
+      amount: Number(txForm.amount),
+      account_id: txForm.account_id,
+      transaction_date: txForm.transaction_date,
+    };
     try {
-      const url = selectedTx ? `/transactions/${selectedTx.id}/update` : '/transactions/create';
-      await apiFetch(url, { method: selectedTx ? 'PATCH' : 'POST', body: JSON.stringify(txForm) });
+      await apiFetch(url, { 
+        method: selectedTx ? 'PATCH' : 'POST', 
+        body: JSON.stringify(payload) 
+      });
       setIsModalOpen(false);
       loadData();
     } catch (err) { alert('儲存失敗'); }
