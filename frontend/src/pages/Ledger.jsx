@@ -19,6 +19,7 @@ const Ledger = () => {
   const [activeTab, setActiveTab] = useState('ALL');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [errors, setErrors] = useState({});
   const [selectedTx, setSelectedTx] = useState(null);
   const [txForm, setTxForm] = useState({
     transaction_date: new Date().toISOString().split('T')[0],
@@ -79,28 +80,46 @@ const Ledger = () => {
     setIsModalOpen(true);
   };
 
-  const handleChange = (e) => setTxForm({ ...txForm, [e.target.name]: e.target.value });
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setIsEditMode(false);
+    setErrors({});
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    
+    setTxForm({ ...txForm, [name]: value });
+    
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
+  };
 
   const handleTypeChange = (newType) => {
     setTxForm({ ...txForm, type: newType, category: CATEGORY_OPTIONS[newType][0] });
   };
 
   const handleSave = async () => {
+    setErrors({});
+    const dataToSubmit = { ...txForm };
+    const url = selectedTx ? `/transactions/${selectedTx.id}/update` : '/transactions/create';
     try {
-      const dataToSubmit = { ...txForm };
       delete dataToSubmit.account_name;
       dataToSubmit.amount = Number(dataToSubmit.amount);
 
-      const url = selectedTx ? `/transactions/${selectedTx.id}/update` : '/transactions/create';
-      
       await apiFetch(url, { 
         method: selectedTx ? 'PATCH' : 'POST', 
         body: JSON.stringify(dataToSubmit) 
       });
       
-      setIsModalOpen(false);
-      loadData();
-    } catch (err) { alert('儲存失敗！'); }
+      await loadData();
+      handleCloseModal();
+    } catch (err) {
+      setErrors(
+        err.detail?.field 
+        ? { [err.detail.field]: err.detail.message } 
+        : { name: err.detail?.message || err.message || "發生未知錯誤！" }
+      );
+    }
   };
 
   const handleDelete = async () => {
@@ -151,7 +170,7 @@ const Ledger = () => {
           </div>
         ))}
       </div>
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={isEditMode ? (selectedTx ? "編輯交易" : "新增交易") : "交易詳情"}>
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={isEditMode ? (selectedTx ? "編輯交易" : "新增交易") : "交易詳情"}>
         {isEditMode ? (
           <div className="ledger-form">
             <div className="modal-tabs">
@@ -162,22 +181,31 @@ const Ledger = () => {
               ))}
             </div>
             <div className="form-row">
-              <div className="form-group"><label>交易日期</label><input type="date" name="transaction_date" value={txForm.transaction_date} onChange={handleChange} /></div>
+              <div className="form-group">
+                <label>交易日期</label><input type="date" name="transaction_date" value={txForm.transaction_date} onChange={handleChange} /></div>
               <div className="form-group"><label>憑證日期</label><input type="date" name="accounting_date" value={txForm.accounting_date} onChange={handleChange} /></div>
             </div>
-            <div className="form-group"><label>交易對象</label><input type="text" name="counterparty" value={txForm.counterparty} onChange={handleChange} /></div>
+            <div className="form-group">
+              <label>交易對象</label>
+              <input type="text" name="counterparty" value={txForm.counterparty} onChange={handleChange} />
+              {errors.counterparty && <span className="error-text">{errors.counterparty}</span>}
+            </div>
             <div className="form-group"><label>交易分類</label>
               <select name="category" value={txForm.category} onChange={handleChange}>
                 {CATEGORY_OPTIONS[txForm.type].map(cat => <option key={cat} value={cat}>{cat}</option>)}
               </select>
             </div>
             <div className="amount-row">
-              <div className="form-group"><label>交易金額</label><input type="number" name="amount" value={txForm.amount} onChange={handleChange} /></div>
+              <div className="form-group">
+                <label>交易金額</label>
+                <input type="number" name="amount" value={txForm.amount} onChange={handleChange} /> 
+                {errors.amount && <span className="error-text">{errors.amount}</span>}              
+              </div>
               <div className="form-group"><label>交易帳戶</label>
                 <select name="account_id" value={txForm.account_id} onChange={handleChange}>
                   {accounts.map(acc => <option key={acc.id} value={acc.id}>{acc.name}</option>)}
                 </select>
-              </div>
+              </div>            
             </div>
             <div className="form-group"><label>備註說明</label><input type="text" name="note" value={txForm.note} onChange={handleChange} /></div>
             <button className="save-btn" onClick={handleSave}>儲存交易</button>

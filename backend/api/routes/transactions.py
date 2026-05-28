@@ -1,6 +1,7 @@
 from typing import List
 
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, HTTPException
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import joinedload
 
 from api.deps import SessionDep, CurrentUser
@@ -8,6 +9,15 @@ from models import Transaction
 from schemas import TransactionResponse, TransactionCreate, TransactionUpate
 
 router = APIRouter(tags=["transactions"])
+
+
+def validate_transaction_data(counterparty, amount):
+    if not counterparty or counterparty.strip() == "":
+        raise HTTPException(status_code=422, detail={"field": "counterparty", "message": "請填入交易對象！"})
+    
+    if amount < 0:
+        raise HTTPException(status_code=422, detail={"field": "amount", "message": "請填入正確的金額！"})
+
 
 @router.get("/transactions/", response_model=List[TransactionResponse])
 def get_transactions(
@@ -24,10 +34,12 @@ def get_transactions(
     return db_transactions
 
 
-@router.post("/transactions/create", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/transactions/create", response_model=TransactionResponse)
 def create_transaction(
     session: SessionDep, transaction_in: TransactionCreate, current_user: CurrentUser
 ):
+    validate_transaction_data(transaction_in.counterparty, transaction_in.amount)
+
     transaction = Transaction(
         **transaction_in.model_dump(),
         user_id=current_user.id
@@ -69,6 +81,8 @@ def update_transaction(
 
     if not transaction:
         raise HTTPException(status_code=404, detail="交易不存在")
+    
+    validate_transaction_data(transaction_in.counterparty, transaction_in.amount)
     
     update_data = transaction_in.model_dump(exclude_unset=True, exclude_none=True)
 

@@ -150,16 +150,31 @@
   align-items: end;
 }
 
-.amount-row {
-  display: grid;
-  grid-template-columns: 2fr 3fr;
-  gap: 15px;
-  align-items: end;
+.form-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 4px;
 }
 
-.form-row .form-group, 
-.amount-row .form-group {
-  min-width: 0;
+.amount-row {
+  display: flex;;
+  gap: 15px;
+  align-items: flex-start;
+}
+
+.amount-row .form-group:nth-child(1) {
+  flex: 2;
+}
+
+.amount-row .form-group:nth-child(2) {
+  flex: 3;
+}
+
+.amount-row input, 
+.amount-row select {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .modal-actions {
