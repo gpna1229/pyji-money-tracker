@@ -86,20 +86,21 @@ const Ledger = () => {
   };
 
   const handleSave = async () => {
-    const url = selectedTx ? `/transactions/${selectedTx.id}/update` : '/transactions/create';
-    const payload = {
-      amount: Number(txForm.amount),
-      account_id: txForm.account_id,
-      transaction_date: txForm.transaction_date,
-    };
     try {
+      const dataToSubmit = { ...txForm };
+      delete dataToSubmit.account_name;
+      dataToSubmit.amount = Number(dataToSubmit.amount);
+
+      const url = selectedTx ? `/transactions/${selectedTx.id}/update` : '/transactions/create';
+      
       await apiFetch(url, { 
         method: selectedTx ? 'PATCH' : 'POST', 
-        body: JSON.stringify(payload) 
+        body: JSON.stringify(dataToSubmit) 
       });
+      
       setIsModalOpen(false);
       loadData();
-    } catch (err) { alert('儲存失敗'); }
+    } catch (err) { alert('儲存失敗！'); }
   };
 
   const handleDelete = async () => {
