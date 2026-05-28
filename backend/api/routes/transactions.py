@@ -15,7 +15,11 @@ def get_transactions(
 ):
     db_transactions = session.query(Transaction).options(
         joinedload(Transaction.account)
-    ).filter(Transaction.user_id == current_user.id).all()
+    ).filter(
+        Transaction.user_id == current_user.id
+    ).order_by(
+        Transaction.transaction_date.desc() 
+    ).all()
     
     return db_transactions
 
