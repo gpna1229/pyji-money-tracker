@@ -56,11 +56,10 @@ const Assets = () => {
     setErrors({});
     const isEdit = !!selectedAccount;
     const url = isEdit ? `/accounts/${selectedAccount.id}/update` : '/accounts/create';
-    const method = isEdit ? 'PATCH' : 'POST';
     
     try {
       await apiFetch(url, {
-        method,
+        method: isEdit ? 'PATCH' : 'POST',
         body: JSON.stringify({
           ...accountForm,
           initial_balance: Number(accountForm.initial_balance)
