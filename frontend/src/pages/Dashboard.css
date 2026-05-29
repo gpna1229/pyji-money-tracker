@@ -37,14 +37,14 @@
   width: 100%;
 }
 
-.income { 
+.db-income { 
   color: var(--success); 
   font-size: 28px; 
   font-weight: 700; 
   margin: 0; 
 }
 
-.expense { 
+.db-expense { 
   color: var(--danger); 
   font-size: 28px; 
   font-weight: 700; 

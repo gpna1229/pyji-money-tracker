@@ -41,11 +41,11 @@ const Dashboard = () => {
       <div className="summary-cards">
         <div className="card">
           <h3>本月總收入</h3>
-          <p className="income">+NT$ {stats.total_income.toLocaleString()}</p>
+          <p className="db-income">+NT$ {stats.total_income.toLocaleString()}</p>
         </div>
         <div className="card">
           <h3>本月總支出</h3>
-          <p className="expense">-NT$ {stats.total_expense.toLocaleString()}</p>
+          <p className="db-expense">-NT$ {stats.total_expense.toLocaleString()}</p>
         </div>
       </div>
       
