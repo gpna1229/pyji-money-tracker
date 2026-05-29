@@ -1,7 +1,8 @@
 from typing import List
+from datetime import datetime
 
 from fastapi import APIRouter, HTTPException
-from fastapi.encoders import jsonable_encoder
+from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 
 from api.deps import SessionDep, CurrentUser
@@ -94,3 +95,46 @@ def update_transaction(
     session.refresh(transaction)
 
     return transaction
+
+
+@router.get("/transactions/monthly_stats")
+def get_monthly_stats(session: SessionDep, current_user: CurrentUser):
+    today = datetime.now()
+    first_day = today.replace(day=1)
+    
+    transactions = session.query(Transaction).filter(
+        Transaction.user_id == current_user.id,
+        Transaction.transaction_date >= first_day
+    ).all()
+    
+    total_income = 0
+    total_expense = 0
+    category_data = {}
+    
+    for tx in transactions:
+        if tx.type == 'INCOME':
+            total_income += tx.amount
+        elif tx.type == 'EXPENSE':
+            total_expense += tx.amount
+            category_data[tx.category] = category_data.get(tx.category, 0) + tx.amount
+            
+    recent = session.query(Transaction).filter(
+        Transaction.user_id == current_user.id
+    ).order_by(Transaction.transaction_date.desc()).limit(5).all()
+
+    return {
+        "total_income": total_income,
+        "total_expense": total_expense,
+        "category_data": category_data,
+        "recent_transactions": [
+            {
+                "id": t.id,
+                "transaction_date": str(t.transaction_date),
+                "category": t.category,
+                "amount": t.amount,
+                "type": t.type,
+                "note": t.note,
+                "counterparty": t.counterparty
+            } for t in recent
+        ]
+    }
