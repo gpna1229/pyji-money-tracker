@@ -39,3 +39,21 @@ def login_google(
             "name": db_user.name
         }
     }
+
+@router.post("/login/test")
+def login_test(session: SessionDep):
+    test_user = session.query(User).filter(User.id == 1).first()
+    
+    if not test_user:
+        raise HTTPException(status_code=404, detail="測試帳號尚未建立！")
+    
+    access_token = security.create_access_token(subject=str(test_user.id))
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "id": test_user.id,
+            "email": test_user.email,
+            "name": test_user.name
+        }
+    }
