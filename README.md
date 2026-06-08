@@ -32,7 +32,8 @@ Pyji 是一個專為現代使用者打造的記帳網站，支援新增多個資
 <img width="500" alt="image" src="https://github.com/user-attachments/assets/2116d1f4-cc11-43b2-a9c2-34804a94e4bd" />
 
 #### 新增記帳
-<img width="500" alt="image" src="https://github.com/user-attachments/assets/339a83bb-5441-40e2-9f4a-efd0ed57a426" />
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/772d629c-e02f-4512-a88f-9413a9a57708" />
+
 
 #### 新增資產帳戶
 <img width="500" alt="image" src="https://github.com/user-attachments/assets/d2f58c5a-5635-4930-bf9e-3b66580174a3" />
