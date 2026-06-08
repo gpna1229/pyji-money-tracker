@@ -6,6 +6,7 @@ Pyji 是一個專為現代使用者打造的記帳網站，支援新增多個資
 - 後端：FastAPI (Python)
 - 資料庫：MySQL, SQLAlchemy (ORM)
 - 驗證：OAuth 2.0 (Google Login), JWT (JSON Web Token)
+- 容器化：Docker
 - 開發工具：Git, VS Code
 ## 核心功能與技術實現
 #### 安全認證機制
